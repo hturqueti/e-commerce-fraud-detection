@@ -172,9 +172,4 @@ cython_debug/
 
 
 # Data files
-data/*.csv
-data/*.xlsx
-data/*.xls
-data/*.db
-data/*.parquet
-data/*.feather
+data/*
