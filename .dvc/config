@@ -1,0 +1,4 @@
+[core]
+    remote = gc-e-commerce-fraud-detection
+['remote "gc-e-commerce-fraud-detection"']
+    url = gs://dvc-files/e-commerce-fraud-detection
