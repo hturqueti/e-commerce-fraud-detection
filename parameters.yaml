@@ -1,6 +1,12 @@
 plotly:
-  "theme": "plotly_white"
-  "renderer": "vscode+pdf+png+jpeg"
+  theme: plotly_white
+  renderer: vscode+pdf+png+jpeg
+  colors:
+    blue: '#1D69E0'
+    red: '#FA4549'
+  transparency: 0.65
+  histogram:
+    nbins: 30
 
 purchase-database:
   columns:
@@ -24,3 +30,6 @@ purchase-database:
     entrega_doc_3: document_delivery_3
     score_fraude_modelo: fraud_score_model
     fraude: fraud
+  quantiles:
+    min: 0.005
+    max: 0.995
