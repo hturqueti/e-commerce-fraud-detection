@@ -55,10 +55,13 @@ def counting_bar_chart(
     df_count.columns = [*groupby_columns, 'count']
 
     # Calculate percentage
-    df_total_count = df_count[[group_feature, 'count']].groupby(group_feature).sum().rename(columns={'count': 'total_group_feature'})
-    df_count = df_count.merge(df_total_count, on=group_feature)
-    df_count['percentage'] = (df_count['count'] / df_count['total_group_feature'])
-    df_count.drop(['total_group_feature'], axis=1, inplace=True)
+    if group_feature is not None:
+        df_total_count = df_count[[group_feature, 'count']].groupby(group_feature).sum().rename(columns={'count': 'total_group_feature'})
+        df_count = df_count.merge(df_total_count, on=group_feature)
+        df_count['percentage'] = (df_count['count'] / df_count['total_group_feature'])
+        df_count.drop(['total_group_feature'], axis=1, inplace=True)
+    else:
+        df_count['percentage'] = (df_count['count'] / df_count['count'].sum())
 
     # Change labels of features
     df_count[binary_feature] = df_count[binary_feature].map({1: positive_label, 0: negative_label})
@@ -83,9 +86,9 @@ def counting_bar_chart(
 
     # Change text format
     if value_format == 'absolute':
-        fig.update_traces(texttemplate='%{y:.0f}')
+        fig.update_traces(texttemplate='%{y:,.0f}')
     elif value_format == 'relative':
-        fig.update_traces(texttemplate='%{y:.1%}')
+        fig.update_traces(texttemplate='%{y:,.1%}')
         fig.update_layout(yaxis=dict(tickformat='.0%'))
 
    # Set titles and legend
@@ -208,10 +211,13 @@ def overlaid_histograms(
 
     # Set comma as thousands separator
     fig.update_xaxes(tickformat=',')
+    
+    # Set percentage on y-axis
+    fig.update_yaxes(tickformat=',.0%')
 
     # Hide the grid lines
     fig.update_xaxes(showgrid=False)
-    fig.update_yaxes(showgrid=False)
+    # fig.update_yaxes(showgrid=False)
 
     return fig
 
