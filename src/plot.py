@@ -254,3 +254,67 @@ def score_distribution(df: pd.DataFrame, score_number: int, nbinsx: int = 30) ->
     )
 
     return fig
+
+
+def roc_curve(fpr, tpr, thresholds):
+    """
+    Plots an ROC curve using Plotly, given the false positive rates (fpr),
+    true positive rates (tpr), and thresholds from scikit-learn's roc_curve.
+
+    Parameters
+    ----------
+    fpr : array-like
+        False Positive Rates from roc_curve.
+    tpr : array-like
+        True Positive Rates from roc_curve.
+    thresholds : array-like
+        Thresholds corresponding to fpr and tpr.
+
+    Returns
+    -------
+    fig : plotly.graph_objs._figure.Figure
+        The Plotly figure object containing the ROC curve.
+    """
+    fig = go.Figure()
+
+    # Add the ROC curve
+    fig.add_trace(
+        go.Scatter(
+            x=fpr,
+            y=tpr,
+            mode='lines',
+            name='ROC Curve',
+            text=[f"{thr:.4f}" for thr in thresholds],
+            hovertemplate=(
+                "FPR: %{x:.4f}<br>"
+                "TPR: %{y:.4f}<br>"
+                "Threshold: %{text}"
+            ),
+            line=dict(width=2, color='#1D69E0')
+        )
+    )
+
+    # Add the random guess reference line (y = x), dashed
+    fig.add_trace(
+        go.Scatter(
+            x=[0, 1],
+            y=[0, 1],
+            mode='lines',
+            line=dict(dash='dash', color='#FA4549'),
+            name='Random Guess'
+        )
+    )
+
+    # Update layout for titles, axis labels, and making the plot square
+    fig.update_layout(
+        title='ROC Curve',
+        xaxis_title='False Positive Rate (FPR)',
+        yaxis_title='True Positive Rate (TPR)',
+        xaxis=dict(range=[0, 1]),
+        yaxis=dict(range=[0, 1]),
+        width=600,   # Set figure width
+        height=600,  # Set figure height (same as width for a square aspect)
+        showlegend=False,
+    )
+
+    return fig
