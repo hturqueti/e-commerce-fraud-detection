@@ -33,3 +33,27 @@ purchase-database:
   quantiles:
     min: 0.005
     max: 0.995
+
+models:
+  split:
+    train: 0.7
+    calib: 0.1
+    test: 0.2
+  features:
+    - purchase_value
+    - country
+    - score_1
+    - score_2
+    - score_3
+    - score_4
+    - score_5
+    - score_6
+    - score_7
+    - score_8
+    - score_9
+    - score_10
+    - document_delivery_1
+    - document_delivery_2
+    - document_delivery_3
+  target:
+    - fraud
