@@ -1,0 +1,5 @@
+outs:
+- md5: 4a6396b9cc09918005a6d1ffa4daa558
+  size: 17692660
+  hash: md5
+  path: calibrated_lgbm_model.pkl
