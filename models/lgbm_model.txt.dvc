@@ -1,0 +1,5 @@
+outs:
+- md5: b9b5f6d2c06b39499a2be0c81a0656a0
+  size: 17687534
+  hash: md5
+  path: lgbm_model.txt
