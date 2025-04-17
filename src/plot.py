@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -5,8 +6,10 @@ import plotly.io as pio
 import re
 import sys
 
+
 from pathlib import Path
-from typing import Literal, Optional
+from sklearn.metrics import confusion_matrix as c_matrix
+from typing import Literal, Optional, Sequence, Tuple, Union
 
 # Project path
 project_path = Path('.').resolve().parent
@@ -256,7 +259,13 @@ def score_distribution(df: pd.DataFrame, score_number: int, nbinsx: int = 30) ->
     return fig
 
 
-def roc_curve(fpr, tpr, thresholds):
+def roc_curve(
+    fpr: Sequence[float],
+    tpr: Sequence[float],
+    thresholds: Sequence[float],
+    title: Optional[str] = "ROC Curve",
+    subtitle: Optional[str] = None
+) -> go.Figure:
     """
     Plots an ROC curve using Plotly, given the false positive rates (fpr),
     true positive rates (tpr), and thresholds from scikit-learn's roc_curve.
@@ -269,6 +278,10 @@ def roc_curve(fpr, tpr, thresholds):
         True Positive Rates from roc_curve.
     thresholds : array-like
         Thresholds corresponding to fpr and tpr.
+    title : str, optional
+        Title of the plot, by default "ROC Curve".
+    subtitle : str, optional
+        Subtitle of the plot, by default None.
 
     Returns
     -------
@@ -307,7 +320,10 @@ def roc_curve(fpr, tpr, thresholds):
 
     # Update layout for titles, axis labels, and making the plot square
     fig.update_layout(
-        title='ROC Curve',
+        title=title,
+        title_subtitle=dict(
+            text=subtitle
+        ),
         xaxis_title='False Positive Rate (FPR)',
         yaxis_title='True Positive Rate (TPR)',
         xaxis=dict(range=[0, 1]),
@@ -315,6 +331,93 @@ def roc_curve(fpr, tpr, thresholds):
         width=600,   # Set figure width
         height=600,  # Set figure height (same as width for a square aspect)
         showlegend=False,
+    )
+
+    return fig
+
+
+Label = Union[int, str]
+def confusion_matrix(
+    y_true: Sequence[Label],
+    y_pred: Sequence[Label],
+    labels: Tuple[Label, Label] = (0, 1),
+    class_names: Tuple[str, str] = ("Not fraud", "Fraud"),
+    figure_size: int = 600,
+    percent_digits: int = 1,
+) -> go.Figure:
+    """
+    Plot a 2×2 confusion matrix with Plotly, following scikit‑learn’s default:
+      • negative label at index 0 (row 0 / col 0)
+      • positive label at index 1 (row 1 / col 1)
+    The matrix is displayed so that the negative class appears in the top‑left.
+
+    Parameters
+    ----------
+    y_true : Sequence[Label]
+        Ground‐truth labels.
+    y_pred : Sequence[Label]
+        Predicted labels.
+    labels : (neg_label, pos_label), default=(0,1)
+        Actual label values for negative and positive classes.
+    class_names : (neg_name, pos_name), default=("Not fraud","Fraud")
+        Display names for those two classes.
+    figure_size : int, default=600
+        Width and height of the square figure in pixels.
+    percent_digits : int, default=1
+        Decimal places for the percentage text.
+
+    Returns
+    -------
+    go.Figure
+        A Plotly heatmap figure of the confusion matrix.
+    """
+    neg_label, pos_label = labels
+    neg_name,  pos_name  = class_names
+
+    # 1) Compute confusion matrix with fixed label order
+    cm = c_matrix(y_true, y_pred, labels=[neg_label, pos_label])
+    cm_pct = cm / cm.sum() * 100.0
+
+    # 2) Prepare cell annotation: count + percentage
+    fmt = f"{{:.{percent_digits}f}}"
+    cell_text = [
+        [
+            f"{cm[i, j]}<br>({fmt.format(cm_pct[i, j])}%)"
+            for j in range(2)
+        ]
+        for i in range(2)
+    ]
+
+    # 3) Build the heatmap
+    colorscale = [[0.0, "#FFFFFF"], [1.0, "#1D69E0"]]  # white→blue
+
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=cm,
+            x=[f"{neg_name}", f"{pos_name}"],
+            y=[f"{neg_name}", f"{pos_name}"],
+            text=cell_text,
+            texttemplate="%{text}",
+            hovertemplate=(
+                "True %{y}<br>"
+                "Predicted %{x}<br>"
+                "%{text}<extra></extra>"
+            ),
+            colorscale=colorscale,
+            showscale=False,
+        )
+    )
+
+    # 4) Flip y‑axis so that row 0 appears at the top
+    fig.update_yaxes(autorange="reversed")
+    fig.update_xaxes(side="top")
+
+    # 5) Layout settings
+    fig.update_layout(
+        width=figure_size,
+        height=figure_size,
+        xaxis_title="Predicted label",
+        yaxis_title="True label",
     )
 
     return fig
