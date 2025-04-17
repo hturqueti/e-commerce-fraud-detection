@@ -1,0 +1,5 @@
+outs:
+- md5: 76c592824fc1878c66b7bbebfd1d6821
+  size: 4368356
+  hash: md5
+  path: calibrated_xgb_model.pkl
