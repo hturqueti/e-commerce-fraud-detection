@@ -1,5 +1,0 @@
-outs:
-- md5: 0d644e30b7ce183dca5dffd826af1b98
-  size: 7546240
-  hash: md5
-  path: calibrated_xgb_model.json
